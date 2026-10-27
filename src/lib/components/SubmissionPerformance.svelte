@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChartNoAxesCombined } from 'lucide-svelte';
+  import { ChartNoAxesCombined } from '@lucide/svelte';
 
   let { submissions, tracks, primaryMetric, datasetVersion }: {
     submissions: { id: string; originalName: string; trackId: string; datasetVersion: string; status: string; createdAt: string; metrics: Record<string, number> | null }[];

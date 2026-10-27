@@ -1,0 +1,49 @@
+name: Validate
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      UV_PYTHON: '3.14'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: '0.13.6'
+      - run: uv python install 3.14
+      - run: npm ci
+      - run: npm run check
+      - run: npm run content:check
+      - run: npm run build
+      - run: npm run test:security
+      - run: uv run --frozen --project worker python -m pytest -c worker/pyproject.toml worker/tests
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:integration -- --browser
+      - run: npm audit --audit-level=low
+      - run: mkdir -p tmp && uv export --frozen --all-groups --no-emit-project --no-hashes --project worker -o tmp/worker-requirements.txt
+      - run: uvx pip-audit --disable-pip --no-deps -r tmp/worker-requirements.txt
+  containers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: docker compose --env-file .env.example -f compose.yaml -f compose.production.yaml config --quiet
+        env:
+          PUBLIC_DOMAIN: challenge.example.org
+      - run: docker compose --env-file .env.example build --pull
+      - run: docker compose --env-file .env.example up -d --wait --wait-timeout 180
+      - run: curl --fail http://127.0.0.1:3000/api/health
+      - if: failure()
+        run: docker compose --env-file .env.example logs --no-color --tail 100
+      - if: always()
+        run: docker compose --env-file .env.example down -v

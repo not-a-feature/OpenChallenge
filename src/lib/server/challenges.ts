@@ -7,7 +7,8 @@ export type ChallengeConfig = {
   slug: string; title: string; shortTitle: string; description: string; example: boolean; datasetVersion: string;
   evaluator: string; primaryMetric: string; dailyLimit: number; maxUploadBytes: number; teamSizeLimit: number;
   closesAt: string | null; tracks: Track[]; docs: { slug: string; title: string }[]; links: { label: string; url: string }[];
-  home?: { headline: string; summary: string; body: string; illustration: 'dna' | 'generic' };
+  logo?: string;
+  home?: { headline: string; summary: string; body: string; illustration?: string; diagram?: string; diagramAlt?: string };
 };
 export const challengeRoot = resolve(process.env.CHALLENGES_DIR ?? 'challenges');
 export const configs: ChallengeConfig[] = readdirSync(challengeRoot, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => {
@@ -47,8 +48,13 @@ export const configs: ChallengeConfig[] = readdirSync(challengeRoot, { withFileT
     assert(typeof config.home.headline === 'string' && config.home.headline.trim(), `${entry.name}: home headline required.`);
     assert(typeof config.home.summary === 'string' && config.home.summary.trim(), `${entry.name}: home summary required.`);
     assert.match(config.home.body, /^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/);
-    assert(['dna', 'generic'].includes(config.home.illustration), `${entry.name}: invalid home illustration.`);
+
     assert(statSync(resolve(challengeRoot, entry.name, config.home.body)).isFile(), `${entry.name}: home body missing.`);
+  }
+  for (const asset of [config.logo, config.home?.illustration, config.home?.diagram]) {
+    if (asset === undefined) continue;
+    assert.match(asset, /^\/challenge-assets\/[a-z0-9]+(?:-[a-z0-9]+)*\/[a-z0-9]+(?:-[a-z0-9]+)*\.(?:svg|png|webp|jpg)$/, `${entry.name}: assets require a local challenge-assets path.`);
+    assert(statSync(resolve('static', asset.slice(1))).isFile(), `${entry.name}: asset missing.`);
   }
   return config;
 });

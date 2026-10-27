@@ -1,7 +1,7 @@
 [project]
-name = "challenge-portal-worker"
+name = "openchallenge-worker"
 version = "0.1.0"
-description = "Archive validation and reproducible string comparison for the challenge portal"
+description = "Archive validation and reproducible string comparison for OpenChallenge"
 requires-python = ">=3.12"
 dependencies = [
     "psycopg[binary]>=3.2,<4",

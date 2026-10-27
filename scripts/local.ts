@@ -6,13 +6,14 @@ import { existsSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
+import { configs, challengeRoot } from '../src/lib/server/challenges';
 
 const root = process.cwd();
 assert(existsSync(resolve(root, 'build/index.js')), 'Run npm run build first.');
 const directory = resolve(root, 'data/postgres');
 await mkdir(resolve(root, 'data/uploads'), { recursive: true });
 const database = new EmbeddedPostgres({ databaseDir: directory, user: 'portal', password: 'local-preview-only', port: 55432, persistent: true, postgresFlags: ['-h', '127.0.0.1'], onLog: () => {}, onError: console.error });
-const env = { ...process.env, VIRTUAL_ENV: undefined, DATABASE_URL: 'postgresql://portal:local-preview-only@127.0.0.1:55432/portal', ORIGIN: 'http://localhost:3000', BETTER_AUTH_URL: 'http://localhost:3000', HOST: '127.0.0.1', PORT: '3000', DEMO_MODE: 'true', ADMIN_EMAILS: process.env.ADMIN_EMAILS ?? 'demo@example.test', BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? 'local-preview-secret-at-least-thirty-two-characters', UPLOAD_DIR: resolve(root, 'data/uploads'), GROUND_TRUTH_DIR: resolve(root, 'examples/dna-inversion/private'), CHALLENGES_DIR: resolve(root, 'challenges'), BODY_SIZE_LIMIT: '12M' };
+const env = { ...process.env, VIRTUAL_ENV: undefined, DATABASE_URL: 'postgresql://portal:local-preview-only@127.0.0.1:55432/portal', ORIGIN: 'http://localhost:3000', BETTER_AUTH_URL: 'http://localhost:3000', HOST: '127.0.0.1', PORT: '3000', DEMO_MODE: 'true', ADMIN_EMAILS: process.env.ADMIN_EMAILS ?? 'demo@example.test', BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET ?? 'local-preview-secret-at-least-thirty-two-characters', UPLOAD_DIR: resolve(root, 'data/uploads'), GROUND_TRUTH_DIR: resolve(process.env.GROUND_TRUTH_DIR ?? resolve(root, 'examples', configs[0].slug, 'private')), CHALLENGES_DIR: challengeRoot, BODY_SIZE_LIMIT: '12M' };
 const children: ChildProcess[] = [];
 let started = false;
 let stopping: Promise<void> | undefined;

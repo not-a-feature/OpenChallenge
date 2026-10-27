@@ -1,6 +1,6 @@
 <script lang="ts">
   import { invalidateAll } from '$app/navigation';
-  import { Upload, FileArchive, ArrowRight, ShieldCheck, Check, AlertCircle, Info, LogIn, Users, Clock3, FileText, LoaderCircle } from 'lucide-svelte';
+  import { Upload, FileArchive, ArrowRight, ShieldCheck, Check, AlertCircle, Info, LogIn, Users, Clock3, FileText, LoaderCircle } from '@lucide/svelte';
   import StatusBadge from '#lib/components/StatusBadge.svelte';
   import SubmissionPerformance from '#lib/components/SubmissionPerformance.svelte';
   import type { PageData } from './$types';

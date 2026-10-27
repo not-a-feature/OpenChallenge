@@ -3,7 +3,7 @@
 - Install Docker Engine + Compose 2.24.4+.
 - DNS A/AAAA → VM. Allow TCP 80/443; UDP443 optional HTTP/3.
 - Copy `.env.example` → `.env`; restrict file permissions (`chmod 600 .env` on Linux).
-- Generate separate random values for the database password and authentication secret, for example with `openssl rand -hex 32` twice. Public startup rejects the example authentication secrets and database passwords shorter than 24 characters.
+- Generate four different random values for the administrator, web, and worker database passwords and authentication secret, for example with `openssl rand -hex 32`. Public startup rejects example secrets and database passwords shorter than 24 characters.
 
 ```dotenv
 PUBLIC_DOMAIN=challenge.example.org
@@ -11,6 +11,8 @@ ORIGIN=https://challenge.example.org
 BETTER_AUTH_URL=https://challenge.example.org
 DEMO_MODE=false
 POSTGRES_PASSWORD=<random-url-safe-password-at-least-24-characters>
+WEB_DATABASE_PASSWORD=<different-random-url-safe-password-at-least-24-characters>
+WORKER_DATABASE_PASSWORD=<different-random-url-safe-password-at-least-24-characters>
 BETTER_AUTH_SECRET=<random-secret-at-least-32-characters>
 GITHUB_CLIENT_ID=<production-client-id>
 GITHUB_CLIENT_SECRET=<production-client-secret>
@@ -18,7 +20,7 @@ ADMIN_EMAILS=organizer@example.org
 ```
 
 GitHub OAuth callback: `https://challenge.example.org/api/auth/callback/github`.
-Google/university configuration: [authentication](authentication.md).
+Google and OpenID Connect configuration: [authentication](authentication.md).
 
 ```bash
 docker compose -f compose.yaml -f compose.production.yaml config --quiet
@@ -29,7 +31,7 @@ The web image embeds `ORIGIN` during its build for SvelteKit's origin checks. Th
 
 - Production override: remove web/DB host ports with `!reset`; expose Caddy only.
 - HTTPS: Caddy automatic certificates; persistent `/data` and `/config` volumes.
-- Startup: migrate/seed web → health check → worker.
+- Startup: short-lived migration/provisioning/token-encryption service, then seeded web, health check, and worker. Administrator credentials are supplied only to the migration service. The web and worker have separate restricted database roles.
 - Uploads: shared volume; web/worker UID10001; worker mounts uploads read-only. References: read-only worker mount, excluded from the web Docker build context.
 - Web/worker: read-only root filesystems, all Linux capabilities dropped, no privilege escalation, bounded process counts, and a 64 MiB temporary filesystem. Web memory: 1 GiB; adjust for measured load.
 - Database and worker use an internal network. Only web connects to both the proxy network and database network; worker has no external network route. Caddy cannot connect directly to PostgreSQL.
@@ -41,7 +43,7 @@ The web image embeds `ORIGIN` during its build for SvelteKit's origin checks. Th
 - Password: URL-safe characters; otherwise percent-encode database URL credentials.
 - Changing `POSTGRES_PASSWORD` in `.env` does not rotate a password in an existing PostgreSQL volume. Rotate it in PostgreSQL too, then recreate the application containers with the matching value; do not delete the data volume.
 - Upgrade: backup → review migration/config → same rebuild command. Keep previous image.
-- Multiple web replicas later: separate one-shot migration service.
+- Existing deployments: add the two runtime passwords before upgrading. Provisioning creates or updates their roles on the existing database; it does not erase stored users, submissions, or scores. Token encryption uses the unchanged authentication secret and runs in one transaction.
 
 ## Backup
 

@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      compatible-updates:
+        update-types: [minor, patch]
+  - package-ecosystem: uv
+    directory: /worker
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directories: [/, /worker]
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

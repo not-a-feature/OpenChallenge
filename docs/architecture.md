@@ -28,5 +28,5 @@ Browser → poll → status/results
 - Public progression: track leaderboard loader selects up to five leading teams, then SQL returns only strict improvements to each team's primary metric, grouped by completion timestamp. Filtered to the current dataset and the phase's completion cutoff (also during the final phase). Public series contain team names, completion times, and scores; no filenames or non-improving attempts. Overall weighted-score history is not plotted.
 - Authored content: JSON + Markdown; sanitized server rendering. See [content](content.md).
 - Defaults: one VM, one worker. Benchmark limits before competition.
-- Example: three model-labelled tracks; tiny synthetic DNA fixtures. Replace with real references/rules/dates.
+- Example: three equally weighted tracks with small synthetic text fixtures. Replace the task, references, rules, and dates before a real event.
 

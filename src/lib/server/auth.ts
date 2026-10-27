@@ -15,12 +15,12 @@ function configured(keys: string[]) {
 }
 const githubConfigured = configured(['GITHUB_CLIENT_ID', 'GITHUB_CLIENT_SECRET']);
 const googleConfigured = configured(['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']);
-const universityConfigured = configured(['UNIVERSITY_OIDC_CLIENT_ID', 'UNIVERSITY_OIDC_CLIENT_SECRET', 'UNIVERSITY_OIDC_DISCOVERY_URL']);
-if (universityConfigured) assert(new URL(process.env.UNIVERSITY_OIDC_DISCOVERY_URL!).protocol === 'https:', 'University OIDC discovery requires HTTPS.');
+const oidcConfigured = configured(['OIDC_CLIENT_ID', 'OIDC_CLIENT_SECRET', 'OIDC_DISCOVERY_URL']);
+if (oidcConfigured) assert(new URL(process.env.OIDC_DISCOVERY_URL!).protocol === 'https:', 'OIDC discovery requires HTTPS.');
 export const loginProviders = [
   { id: 'google', label: 'Google', enabled: googleConfigured },
   { id: 'github', label: 'GitHub', enabled: githubConfigured },
-  ...(universityConfigured ? [{ id: 'university', label: process.env.UNIVERSITY_LOGIN_LABEL?.trim() || 'University sign-in', enabled: true }] : [])
+  ...(oidcConfigured ? [{ id: 'oidc', label: process.env.OIDC_LOGIN_LABEL?.trim() || 'Organization sign-in', enabled: true }] : [])
 ];
 const originURL = new URL(origin);
 assert.equal(originURL.origin, origin, 'ORIGIN must be an HTTP(S) origin without a path, query, credentials, or trailing slash.');
@@ -33,21 +33,22 @@ if (!localOrigin) {
   assert(!['replace-with-at-least-32-random-characters', 'local-development-secret-replace-before-deployment'].includes(process.env.BETTER_AUTH_SECRET!), 'Replace the example authentication secret before deployment.');
   assert(process.env.DATABASE_URL, 'Set DATABASE_URL for public deployments.');
   const password = decodeURIComponent(new URL(process.env.DATABASE_URL).password);
-  assert(password.length >= 24 && password !== 'local-development-only', 'Public deployments require a random database password of at least 24 characters.');
+  assert(password.length >= 24 && !['local-development-only', 'local-web-password-replace-before-deployment', 'local-worker-password-replace-before-deployment'].includes(password), 'Public deployments require a random database password of at least 24 characters.');
 }
 
 export const auth = betterAuth({
   baseURL: origin, secret: process.env.BETTER_AUTH_SECRET ?? 'local-development-secret-replace-before-deployment',
   database: drizzleAdapter(db, { provider: 'pg', schema }),
+  account: { encryptOAuthTokens: true },
   trustedOrigins: [origin], emailAndPassword: { enabled: demoMode, disableSignUp: !demoMode },
   advanced: { ipAddress: { ipAddressHeaders: ['x-portal-client-ip'] } },
   socialProviders: {
     ...(githubConfigured ? { github: { clientId: process.env.GITHUB_CLIENT_ID!, clientSecret: process.env.GITHUB_CLIENT_SECRET! } } : {}),
     ...(googleConfigured ? { google: { clientId: process.env.GOOGLE_CLIENT_ID!, clientSecret: process.env.GOOGLE_CLIENT_SECRET!, prompt: 'select_account' as const } } : {})
   },
-  plugins: universityConfigured ? [genericOAuth({ config: [{
-    providerId: 'university', clientId: process.env.UNIVERSITY_OIDC_CLIENT_ID!, clientSecret: process.env.UNIVERSITY_OIDC_CLIENT_SECRET!,
-    discoveryUrl: process.env.UNIVERSITY_OIDC_DISCOVERY_URL!, scopes: ['openid', 'email', 'profile'], pkce: true, requireIdTokenVerification: true
+  plugins: oidcConfigured ? [genericOAuth({ config: [{
+    providerId: 'oidc', clientId: process.env.OIDC_CLIENT_ID!, clientSecret: process.env.OIDC_CLIENT_SECRET!,
+    discoveryUrl: process.env.OIDC_DISCOVERY_URL!, scopes: ['openid', 'email', 'profile'], pkce: true, requireIdTokenVerification: true
   }] })] : [],
   session: { expiresIn: 60 * 60 * 24 * 7 },
   rateLimit: { enabled: true, window: 60, max: 60 }

@@ -106,14 +106,6 @@ code, pre { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospac
 .orbit { position: absolute; border: 1px solid #8fb6c41c; border-radius: 50%; left: 50%; top: 48%; transform: translate(-50%, -50%) rotate(-28deg); }
 .orbit-one { width: 330px; height: 225px; }
 .orbit-two { width: 260px; height: 340px; transform: translate(-50%, -50%) rotate(38deg); }
-.helix { position: absolute; top: 20px; left: calc(50% - 56px); width: 120px; transform: rotate(-26deg); transform-style: preserve-3d; }
-.helix-rung { position: relative; width: 114px; height: 21px; transform: rotateY(calc(var(--i) * 24deg)); transform-style: preserve-3d; }
-.helix-rung b { position: absolute; height: 1px; background: linear-gradient(90deg, #68acb3a0, #bf996fa0); width: 100%; top: 10px; }
-.helix-rung span, .helix-rung i { position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #70b5bd; top: 7px; left: 0; box-shadow: 0 0 12px #70b5bd45; }
-.helix-rung i { left: auto; right: 0; background: #d6ae78; box-shadow: 0 0 12px #d6ae7845; }
-.visual-tag { position: absolute; border: 1px solid #ffffff18; border-radius: 4px; background: #1a3549c0; color: #92b0c2; font: 8px Consolas, monospace; padding: 8px 11px; }
-.tag-top { top: 62px; right: 25px; }
-.tag-bottom { bottom: 72px; left: 12px; color: #d0b28d; }
 .visual-coordinate { position: absolute; bottom: 25px; right: 26px; color: #627e91; font-size: 7px; letter-spacing: .14em; }
 .generic-hero-icon { display: grid; place-items: center; position: absolute; inset: 0; color: #86b0b2; }
 .demo-notice { display: flex; gap: 11px; align-items: flex-start; padding: 12px 15px; margin: 19px 0 23px; border: 1px solid #e6e4db; background: #faf9f4; border-radius: 5px; color: #8d825f; }
@@ -140,29 +132,7 @@ code, pre { font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospac
 .step-link small { font-size: 10px; display: block; color: #8995a3; margin-top: 2px; }
 .step-link svg { color: #9aabba; }
 .step-link:hover strong { color: #467e91; }
-.sequence-diagram { background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 18px 24px 13px; margin-bottom: 30px; }
-.diagram-caption { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .small-caps { font-size: 8px; font-weight: 600; color: #7e92a4; letter-spacing: .13em; }
-.diagram-note { font-size: 9px; color: #98a5b2; }
-.diagram-flow { display: flex; justify-content: space-evenly; align-items: center; padding: 23px 14px 21px; gap: 14px; }
-.diagram-stage { text-align: center; flex: 1; display: flex; flex-direction: column; align-items: center; }
-.diagram-icon { color: #719999; margin-bottom: 6px; }
-.diagram-icon.warm { color: #bc9660; }
-.diagram-title { font-size: 10px; font-weight: 600; color: #466075; }
-.diagram-detail { font-size: 9px; color: #93a0ad; margin-top: 7px; }
-.diagram-arrow { color: #c4d0da; }
-.dna-string { display: flex; gap: 3px; margin-top: 10px; height: 25px; align-items: center; }
-.dna-string > * { font: 10px Consolas, monospace; padding: 4px 5px; border-radius: 3px; background: #eff5f3; color: #6c9c85; }
-.dna-string i { color: #7793ad; background: #eef2f8; }
-.dna-string em { color: #ad976b; background: #f9f4e9; }
-.dna-string strong { color: #aa8b96; background: #f7eef1; }
-.dna-string .mismatch { color: #b97c58; background: #fbede2; border: 1px solid #e7b492; padding: 3px 4px; }
-.embedding-bars { display: flex; align-items: center; gap: 4px; height: 25px; margin-top: 10px; }
-.embedding-bars span { width: 7px; background: #89a8b4; border-radius: 2px; opacity: .75; }
-.embedding-bars span:nth-child(3n) { background: #c2ab80; }
-.diagram-footer { border-top: 1px solid #eef1f5; padding-top: 10px; display: flex; align-items: center; gap: 22px; color: #8191a1; font-size: 8px; }
-.diagram-footer > span { display: inline-flex; align-items: center; gap: 6px; }
-.diagram-footer .diagram-example { margin-left: auto; color: #a3adb7; }
 .legend-dot { width: 5px; height: 5px; border-radius: 50%; }
 .teal { background: #82aaa5; }
 .amber { background: #cbb48d; }
@@ -391,10 +361,6 @@ progress::-webkit-progress-value { background: #6d9b9b; }
   .getting-started { padding-left: 23px; }
   .track-card { padding: 16px 14px 0; }
   .track-card h3 { font-size: 13px; }
-  .diagram-flow { padding-left: 0; padding-right: 0; }
-  .diagram-footer { gap: 15px; }
-  .dna-string { gap: 2px; }
-  .dna-string > * { padding: 4px; font-size: 9px; }
   .metric-cards article { padding: 20px 17px; }
   .submission-columns { grid-template-columns: 1.4fr 1fr; gap: 22px; }
   .upload-panel { padding: 20px; }
@@ -408,13 +374,10 @@ progress::-webkit-progress-value { background: #6d9b9b; }
 @media (max-width: 1000px) {
   .hero-panel { grid-template-columns: 1.7fr 1fr; }
   .hero-visual { mask-image: linear-gradient(90deg, transparent, black 45%); }
-  .tag-top { right: -15px; font-size: 7px; }
-  .tag-bottom { left: -15px; font-size: 7px; }
   .stats-grid { gap: 9px; }
   .stat-card { flex-direction: column; align-items: start; padding: 16px; gap: 11px; }
   .overview-columns { grid-template-columns: 1fr; }
   .getting-started { border-left: 0; padding-left: 0; padding-top: 20px; border-top: 1px solid var(--line); }
-  .diagram-footer .diagram-example { display: none; }
   .track-grid { grid-template-columns: 1fr; }
   .track-card { position: relative; padding: 18px 22px; }
   .track-card-top { margin-bottom: 10px; }
@@ -462,7 +425,6 @@ progress::-webkit-progress-value { background: #6d9b9b; }
   .hero-copy p { font-size: 11px; }
   .hero-visual { min-height: 295px; }
   .hero-kicker { font-size: 7px; letter-spacing: .12em; }
-  .diagram-flow { gap: 8px; }
   .phase-form { flex-wrap: wrap; }
   .phase-form label { width: 100%; }
 }
@@ -493,15 +455,6 @@ progress::-webkit-progress-value { background: #6d9b9b; }
   .body-copy { font-size: 11px; }
   .section-title h2 { font-size: 15px; }
   .step-link small { font-size: 9px; }
-  .sequence-diagram { padding: 15px; }
-  .diagram-caption { flex-direction: column; align-items: start; gap: 4px; }
-  .diagram-flow { flex-direction: column; padding: 22px 0; gap: 14px; }
-  .diagram-stage { width: 100%; }
-  .diagram-arrow { transform: rotate(90deg); width: 16px; height: 16px; }
-  .diagram-title { font-size: 11px; }
-  .dna-string { gap: 4px; }
-  .dna-string > * { font-size: 11px; padding: 4px 6px; }
-  .diagram-footer { justify-content: center; gap: 16px; }
   .section-title-row .text-link { font-size: 9px; }
   .track-card { padding: 18px; }
   .resource-strip { padding: 17px; }
@@ -659,3 +612,6 @@ progress::-webkit-progress-value { background: #6d9b9b; }
 }
 
 .submissions-history tr:target { background: #e8f5f3; scroll-margin-top: 90px; }
+
+.challenge-illustration { position: relative; display: block; width: 100%; height: 100%; min-height: 285px; object-fit: contain; }
+.challenge-diagram { display: block; width: 100%; height: auto; margin-bottom: 30px; border-radius: 6px; }

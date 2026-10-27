@@ -1,0 +1,52 @@
+name: Sync template
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+concurrency:
+  group: sync-openchallenge
+  cancel-in-progress: false
+jobs:
+  update:
+    if: github.repository != 'not-a-feature/OpenChallenge'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Merge upstream and open a review pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git remote add upstream https://github.com/not-a-feature/OpenChallenge.git
+          git fetch upstream main
+          if git merge-base --is-ancestor upstream/main HEAD; then
+            echo 'The site already includes the current template.'
+            exit 0
+          fi
+          branch=update-openchallenge-template
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null; then
+            git fetch origin "$branch"
+            git switch -c "$branch" --track "origin/$branch"
+            git merge origin/main -m 'Update site base for template changes'
+          else
+            git switch -c "$branch"
+          fi
+          git merge upstream/main -m 'Merge OpenChallenge template updates'
+          git push origin "$branch"
+          if [ "$(gh pr list --head "$branch" --base main --json number --jq length)" = 0 ]; then
+            cat > "$RUNNER_TEMP/template-update.md" <<'EOF'
+          Includes the latest shared application, dependency, and security changes from OpenChallenge.
+
+          Review challenge content and deployment configuration, and run the validation workflow before merging.
+          EOF
+            gh pr create --head "$branch" --base main --title 'Update OpenChallenge template' --body-file "$RUNNER_TEMP/template-update.md"
+          fi
+          gh workflow run ci.yml --ref "$branch"

@@ -1,12 +1,12 @@
 # Data & submission format
 
-The demo contains 12 synthetic records of 32 nucleotides. The three model tracks use the same records so that you can exercise the complete upload and evaluation workflow locally.
+The demo contains 12 synthetic text records, each 32 characters long. All three tracks use the same records so that you can exercise the upload and evaluation workflow locally.
 
 ## Download examples
 
-- [ZIP example submission](/api/challenges/dna-inversion/examples/sample.zip)
-- [TAR.GZ example submission](/api/challenges/dna-inversion/examples/sample.tar.gz)
-- [CSV example submission](/api/challenges/dna-inversion/examples/sample.csv)
+- [ZIP example submission](/api/challenges/example/examples/sample.zip)
+- [TAR.GZ example submission](/api/challenges/example/examples/sample.tar.gz)
+- [CSV example submission](/api/challenges/example/examples/sample.csv)
 
 ## File format
 
@@ -14,7 +14,7 @@ Upload a `.zip`, `.tar.gz`, `.tgz`, `.tar.bz2`, or `.tar.xz` file containing exa
 
 ```csv
 id,sequence
-seq-001,ACGTACGTACGTACGTACGTACGTACGTACGT
+example-001,an-example-prediction
 ```
 
 IDs must match the reference dataset exactly, without duplicates, missing records, or unknown records. Row order does not matter. Values are compared exactly, including case; strings are never silently changed.

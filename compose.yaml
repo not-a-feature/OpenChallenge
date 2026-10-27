@@ -16,13 +16,30 @@ services:
       timeout: 3s
       retries: 20
     restart: unless-stopped
-  web:
+  migrate:
     build:
       context: .
       args:
         ORIGIN: ${ORIGIN:-http://localhost:3000}
     environment:
       DATABASE_URL: postgresql://portal:${POSTGRES_PASSWORD}@db:5432/portal
+      WEB_DATABASE_PASSWORD: ${WEB_DATABASE_PASSWORD:?Set WEB_DATABASE_PASSWORD in .env}
+      WORKER_DATABASE_PASSWORD: ${WORKER_DATABASE_PASSWORD:?Set WORKER_DATABASE_PASSWORD in .env}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set BETTER_AUTH_SECRET in .env}
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      DEMO_MODE: "false"
+    command: ["sh", "-c", "npm run db:migrate && npm run db:provision && npm run db:encrypt-tokens"]
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+  web:
+    build:
+      context: .
+      args:
+        ORIGIN: ${ORIGIN:-http://localhost:3000}
+    environment:
+      DATABASE_URL: postgresql://portal_web:${WEB_DATABASE_PASSWORD}@db:5432/portal
       BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Set BETTER_AUTH_SECRET in .env}
       ORIGIN: ${ORIGIN:-http://localhost:3000}
       BETTER_AUTH_URL: ${ORIGIN:-http://localhost:3000}
@@ -30,10 +47,10 @@ services:
       GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
-      UNIVERSITY_OIDC_CLIENT_ID: ${UNIVERSITY_OIDC_CLIENT_ID:-}
-      UNIVERSITY_OIDC_CLIENT_SECRET: ${UNIVERSITY_OIDC_CLIENT_SECRET:-}
-      UNIVERSITY_OIDC_DISCOVERY_URL: ${UNIVERSITY_OIDC_DISCOVERY_URL:-}
-      UNIVERSITY_LOGIN_LABEL: ${UNIVERSITY_LOGIN_LABEL:-University sign-in}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      OIDC_DISCOVERY_URL: ${OIDC_DISCOVERY_URL:-}
+      OIDC_LOGIN_LABEL: ${OIDC_LOGIN_LABEL:-Organization sign-in}
       DEMO_MODE: ${DEMO_MODE:-false}
       ADMIN_EMAILS: ${ADMIN_EMAILS:-demo@example.test}
       UPLOAD_DIR: /data/uploads
@@ -44,8 +61,8 @@ services:
       - uploads:/data/uploads
       - ./challenges:/app/challenges:ro
     depends_on:
-      db:
-        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/health', {headers: {'X-Forwarded-For': '127.0.0.1'}}).then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 5s
@@ -57,14 +74,14 @@ services:
     build:
       context: ./worker
     environment:
-      DATABASE_URL: postgresql://portal:${POSTGRES_PASSWORD}@db:5432/portal
+      DATABASE_URL: postgresql://portal_worker:${WORKER_DATABASE_PASSWORD}@db:5432/portal
       UPLOAD_DIR: /data/uploads
       GROUND_TRUTH_DIR: /data/reference
       POLL_SECONDS: ${POLL_SECONDS:-2}
       JOB_TIMEOUT_SECONDS: ${JOB_TIMEOUT_SECONDS:-120}
     volumes:
       - uploads:/data/uploads
-      - ./examples/dna-inversion/private:/data/reference:ro
+      - ${GROUND_TRUTH_DIR:-./examples/example/private}:/data/reference:ro
       - ./challenges:/app/challenges:ro
     depends_on:
       web:

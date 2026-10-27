@@ -174,7 +174,7 @@ def test_stream_limit():
 
 
 def test_reference_fixture_and_checksum():
-    fixture = Path(__file__).resolve().parents[2] / "examples" / "dna-inversion"
+    fixture = Path(__file__).resolve().parents[2] / "examples" / "example"
     archive = fixture / "sample.zip"
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     assert score(archive, archive.name, fixture / "private" / "reference.csv", 12, digest) == {
@@ -186,7 +186,7 @@ def test_reference_fixture_and_checksum():
 
 
 def test_perturbed_fixture():
-    fixture = Path(__file__).resolve().parents[2] / "examples" / "dna-inversion"
+    fixture = Path(__file__).resolve().parents[2] / "examples" / "example"
     archive = fixture / "perturbed.zip"
     digest = hashlib.sha256(archive.read_bytes()).hexdigest()
     assert score(archive, archive.name, fixture / "private" / "reference.csv", 12, digest) == {

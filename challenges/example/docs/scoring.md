@@ -1,6 +1,6 @@
 # Evaluation & metrics
 
-The comparator joins predictions to reference strings by ID. It works with arbitrary strings; the DNA example does not impose a nucleotide alphabet.
+The comparator joins predictions to reference strings by ID. Values are arbitrary text and are compared exactly, including case.
 
 ## Accuracy
 
@@ -18,7 +18,7 @@ For each record: `1 - distance / max(reference length, prediction length)`. The 
 
 The fraction of records whose predicted string equals the reference exactly.
 
-These metric definitions belong to this scaffold's example. They should not be interpreted as a reproduction of the paper's complete evaluation protocol.
+These metrics belong to the example task. A different prediction task requires an appropriate evaluator and published metric definitions.
 
 ## Overall leaderboard
 

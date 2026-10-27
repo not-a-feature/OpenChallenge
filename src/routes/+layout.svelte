@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { goto } from '$app/navigation';
-  import { Dna, House, BookOpen, Database, ShieldCheck, Trophy, Upload, Users, Github, ArrowUpRight, ChevronDown, Menu, X, Layers, SlidersHorizontal, LogOut, LogIn, FlaskConical, PanelLeftClose, PanelLeftOpen, GripVertical } from 'lucide-svelte';
+  import { House, BookOpen, Database, ShieldCheck, Trophy, Upload, Users, CodeXml, ArrowUpRight, ChevronDown, Menu, X, Layers, SlidersHorizontal, LogOut, LogIn, FlaskConical, PanelLeftClose, PanelLeftOpen, GripVertical } from '@lucide/svelte';
   import type { LayoutData } from './$types';
   import type { Snippet } from 'svelte';
   let { data, children }: { data: LayoutData; children: Snippet } = $props();
@@ -33,13 +33,13 @@
   let currentLabel = $derived([...nav, ...workspace, { label: 'Organizer console', href: base + '/admin' }].find((item) => item.href === page.url.pathname)?.label ?? (page.url.pathname === '/login' ? 'Sign in' : 'Challenges'));
   function clampWidth(value: number) { return Math.round(Math.min(maxWidth, Math.max(minWidth, value))); }
   function saveSidebar() {
-    window.localStorage.setItem('challenge-portal.sidebarWidth', String(sidebarWidth));
-    window.localStorage.setItem('challenge-portal.sidebarCollapsed', String(sidebarCollapsed));
+    window.localStorage.setItem('openchallenge.sidebarWidth', String(sidebarWidth));
+    window.localStorage.setItem('openchallenge.sidebarCollapsed', String(sidebarCollapsed));
   }
   onMount(() => {
-    const savedWidth = Number(window.localStorage.getItem('challenge-portal.sidebarWidth') ?? defaultWidth);
+    const savedWidth = Number(window.localStorage.getItem('openchallenge.sidebarWidth') ?? defaultWidth);
     if (Number.isFinite(savedWidth)) sidebarWidth = clampWidth(savedWidth);
-    sidebarCollapsed = window.localStorage.getItem('challenge-portal.sidebarCollapsed') === 'true';
+    sidebarCollapsed = window.localStorage.getItem('openchallenge.sidebarCollapsed') === 'true';
   });
   function toggleSidebar() { sidebarCollapsed = !sidebarCollapsed; saveSidebar(); }
   function startResize(event: PointerEvent) {
@@ -97,7 +97,7 @@
   <a href="#main-content" class="skip-link">Skip to content</a>
   {#if mobileOpen}<button class="sidebar-backdrop" aria-label="Close navigation" onclick={() => mobileOpen = false}></button>{/if}
   <aside id="challenge-navigation" class:mobile-open={mobileOpen} class="sidebar">
-    <a class="brand" href={base} aria-label={(challenge?.shortTitle ?? 'OpenChallenge') + ' overview'} title={challenge?.shortTitle ?? 'OpenChallenge'} onclick={() => mobileOpen = false}><span class="brand-mark">{#if challenge?.slug === 'dna-inversion' && challenge.example}<Dna size={27} strokeWidth={1.7} aria-hidden="true" />{:else}<Layers size={25} strokeWidth={1.7} aria-hidden="true" />{/if}</span><span class="brand-copy"><strong>{challenge?.shortTitle ?? 'OpenChallenge'}</strong><small>RESEARCH CHALLENGE</small></span></a>
+    <a class="brand" href={base} aria-label={(challenge?.shortTitle ?? 'OpenChallenge') + ' overview'} title={challenge?.shortTitle ?? 'OpenChallenge'} onclick={() => mobileOpen = false}><span class="brand-mark">{#if challenge?.logo}<img src={challenge.logo} alt="" width="27" height="27" />{:else}<Layers size={25} strokeWidth={1.7} aria-hidden="true" />{/if}</span><span class="brand-copy"><strong>{challenge?.shortTitle ?? 'OpenChallenge'}</strong><small>RESEARCH CHALLENGE</small></span></a>
     <a class="challenge-switcher" href="/challenges" aria-label="Explore challenges" title="Explore challenges"><Layers size={15} aria-hidden="true" /><span class="switcher-label">Explore challenges</span><ChevronDown class="switcher-arrow" size={14} aria-hidden="true" /></a>
     <nav aria-label="Main navigation">
       <div class="nav-group-label">Information</div>
@@ -107,7 +107,7 @@
       {#if data.isAdmin}<div class="nav-group-label workspace-label">Organization</div><a href={base + '/admin'} aria-label="Organizer console" title="Organizer console" class:active={page.url.pathname.endsWith('/admin')} onclick={() => mobileOpen = false}><SlidersHorizontal size={17} aria-hidden="true" /><span class="nav-item-label">Organizer console</span></a>{/if}
     </nav>
     <div class="sidebar-bottom">
-      <div class="sidebar-resources"><span class="nav-group-label">Research resources</span>{#each challenge?.links ?? [] as link}<a href={link.url} aria-label={link.label} title={link.label} target="_blank" rel="noreferrer">{#if link.url.includes('github.com')}<Github size={15} aria-hidden="true" />{:else}<BookOpen size={15} aria-hidden="true" />{/if}<span class="resource-label">{link.label}</span><ArrowUpRight class="resource-arrow" size={14} aria-hidden="true" /></a>{/each}</div>
+      <div class="sidebar-resources"><span class="nav-group-label">Research resources</span>{#each challenge?.links ?? [] as link}<a href={link.url} aria-label={link.label} title={link.label} target="_blank" rel="noreferrer">{#if link.url.includes('github.com')}<CodeXml size={15} aria-hidden="true" />{:else}<BookOpen size={15} aria-hidden="true" />{/if}<span class="resource-label">{link.label}</span><ArrowUpRight class="resource-arrow" size={14} aria-hidden="true" /></a>{/each}</div>
       {#if data.user}<div class="user-card"><span class="avatar" title={data.user.name}>{data.user.name.slice(0, 1).toUpperCase()}</span><span class="user-info"><strong>{data.user.name}</strong><small>{data.isAdmin ? 'Organizer' : 'Participant'}</small></span><button class="icon-button" aria-label="Sign out" title="Sign out" onclick={logout}><LogOut size={17} aria-hidden="true" /></button></div>{:else}<a class="sidebar-login" href="/login" aria-label="Sign in" title="Sign in"><LogIn size={18} aria-hidden="true" /><span class="login-copy"><strong>Sign in</strong><small>Join a team to participate</small></span><ArrowUpRight class="login-arrow" size={16} aria-hidden="true" /></a>{/if}
       {#if logoutError}<p class="sidebar-error" role="alert">{logoutError}</p>{/if}
       <div class="sidebar-controls"><button class="sidebar-collapse-button" type="button" aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'} aria-expanded={!sidebarCollapsed} aria-controls="challenge-navigation" onclick={toggleSidebar}>{#if sidebarCollapsed}<PanelLeftOpen size={17} aria-hidden="true" />{:else}<PanelLeftClose size={17} aria-hidden="true" /><span>Collapse sidebar</span>{/if}</button></div>

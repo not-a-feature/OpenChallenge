@@ -10,13 +10,14 @@ const env = {
   DATABASE_URL: 'postgresql://portal:security-test-database-password@localhost:5432/portal',
   ADMIN_EMAILS: 'organizer@example.test',
   GITHUB_CLIENT_ID: '', GITHUB_CLIENT_SECRET: '', GOOGLE_CLIENT_ID: '', GOOGLE_CLIENT_SECRET: '',
-  UNIVERSITY_OIDC_CLIENT_ID: '', UNIVERSITY_OIDC_CLIENT_SECRET: '', UNIVERSITY_OIDC_DISCOVERY_URL: ''
+  OIDC_CLIENT_ID: '', OIDC_CLIENT_SECRET: '', OIDC_DISCOVERY_URL: ''
 };
 const source = `
   import assert from 'node:assert/strict';
   import { auth, isAdmin } from './src/lib/server/auth.ts';
   import { pool } from './src/lib/server/db.ts';
   assert.equal(auth.options.emailAndPassword.enabled, false);
+  assert.equal(auth.options.account.encryptOAuthTokens, true);
   assert.equal(isAdmin('organizer@example.test', false), false);
   assert.equal(isAdmin('organizer@example.test', true), true);
   assert.equal(isAdmin('participant@example.test', true), false);
@@ -38,6 +39,8 @@ for (const [name, overrides, message] of [
   ['fallback auth secret', { BETTER_AUTH_SECRET: 'local-development-secret-replace-before-deployment' }, 'Replace the example authentication secret'],
   ['missing database', { DATABASE_URL: '' }, 'Set DATABASE_URL'],
   ['example database password', { DATABASE_URL: 'postgresql://portal:local-development-only@localhost/portal' }, 'random database password'],
+  ['example web database password', { DATABASE_URL: 'postgresql://portal_web:local-web-password-replace-before-deployment@localhost/portal' }, 'random database password'],
+  ['example worker database password', { DATABASE_URL: 'postgresql://portal_worker:local-worker-password-replace-before-deployment@localhost/portal' }, 'random database password'],
   ['short database password', { DATABASE_URL: 'postgresql://portal:short@localhost/portal' }, 'random database password']
 ] as const) {
   test(`rejects ${name} before connecting to the database`, () => {

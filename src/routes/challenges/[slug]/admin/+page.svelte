@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms';
   import { onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
-  import { SlidersHorizontal, RefreshCw, ShieldCheck, AlertCircle, Activity, Clock3, FileText, ArrowUpRight, FolderOpen } from 'lucide-svelte';
+  import { SlidersHorizontal, RefreshCw, ShieldCheck, AlertCircle, Activity, Clock3, FileText, ArrowUpRight, FolderOpen } from '@lucide/svelte';
   import StatusBadge from '#lib/components/StatusBadge.svelte';
   import type { PageData, ActionData } from './$types';
   let { data, form }: { data: PageData; form: ActionData } = $props();

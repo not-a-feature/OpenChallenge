@@ -14,3 +14,7 @@ data/
 tmp/
 worker/.venv/
 worker/.pytest_cache/
+references/
+*.dump
+*.pem
+*.key

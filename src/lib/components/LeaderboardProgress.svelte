@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ChartNoAxesCombined } from 'lucide-svelte';
+  import { ChartNoAxesCombined } from '@lucide/svelte';
   let { teams, metricLabel, frozenAt }: {
     teams: { teamName: string; points: { at: string; score: number }[] }[];
     metricLabel: string;

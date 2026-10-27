@@ -8,7 +8,7 @@ import tarfile
 import zipfile
 from pathlib import Path
 
-OUTPUT = Path(__file__).resolve().parent / "dna-inversion"
+OUTPUT = Path(__file__).resolve().parent / "example"
 
 
 def csv_bytes(rows):
@@ -31,9 +31,9 @@ def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "private").mkdir(exist_ok=True)
     generator = random.Random(438)
-    rows = [(f"dna-{index:03d}", "".join(generator.choices("ACGT", k=32))) for index in range(1, 13)]
+    rows = [(f"example-{index:03d}", "".join(generator.choices("abcdefghijklmnopqrstuvwxyz0123456789", k=32))) for index in range(1, 13)]
     perfect = csv_bytes(rows)
-    substituted = csv_bytes([(identifier, {"A": "C", "C": "G", "G": "T", "T": "A"}[sequence[0]] + sequence[1:]) for identifier, sequence in rows])
+    substituted = csv_bytes([(identifier, ("z" if sequence[0] != "z" else "a") + sequence[1:]) for identifier, sequence in rows])
     (OUTPUT / "private" / "reference.csv").write_bytes(perfect)
     (OUTPUT / "sample.csv").write_bytes(perfect)
     (OUTPUT / "perturbed.csv").write_bytes(substituted)

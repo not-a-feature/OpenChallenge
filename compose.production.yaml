@@ -3,6 +3,16 @@ services:
     ports: !reset []
     networks: [backend]
     security_opt: [no-new-privileges:true]
+  migrate:
+    build:
+      args:
+        ORIGIN: https://${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+    networks: [backend]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    environment:
+      ORIGIN: https://${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
   web:
     build:
       args:

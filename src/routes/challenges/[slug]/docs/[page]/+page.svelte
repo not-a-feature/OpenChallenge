@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { BookOpen, ArrowUpRight, Github, ArrowRight, Download, FileArchive } from 'lucide-svelte';
+  import { BookOpen, ArrowUpRight, CodeXml, ArrowRight, Download, FileArchive } from '@lucide/svelte';
   import { page } from '$app/state';
   import type { PageData } from './$types';
   let { data }: { data: PageData } = $props();

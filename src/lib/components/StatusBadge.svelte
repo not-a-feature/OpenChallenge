@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CheckCircle2, CircleDashed, AlertCircle, LoaderCircle } from 'lucide-svelte';
+  import { CheckCircle2, CircleDashed, AlertCircle, LoaderCircle } from '@lucide/svelte';
   let { status }: { status: string } = $props();
   const labels: Record<string, string> = { uploading: 'Uploading', queued: 'Queued', validating: 'Validating', scoring: 'Scoring', completed: 'Completed', rejected: 'Rejected', failed: 'Failed', running: 'Processing' };
 </script>

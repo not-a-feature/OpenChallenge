@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { invalidateAll } from '$app/navigation';
-  import { Trophy, ArrowUpRight, ArrowRight, Upload, Medal, Layers } from 'lucide-svelte';
+  import { Trophy, ArrowUpRight, ArrowRight, Upload, Medal, Layers } from '@lucide/svelte';
   import StatusBadge from '#lib/components/StatusBadge.svelte';
   import LeaderboardProgress from '#lib/components/LeaderboardProgress.svelte';
   import type { PageData } from './$types';

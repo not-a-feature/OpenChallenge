@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { ArrowRight, ArrowUpRight, BookOpen, Upload, Users, Database, Check, GitBranch, CircleDot, Github, Layers } from 'lucide-svelte';
-  import SequenceDiagram from '#lib/components/SequenceDiagram.svelte';
+  import { ArrowRight, ArrowUpRight, BookOpen, Upload, Users, Database, Check, GitBranch, CircleDot, CodeXml, Layers } from '@lucide/svelte';
   import type { PageData } from './$types';
   let { data }: { data: PageData } = $props();
   let config = $derived(data.config);
   let base = $derived('/challenges/' + config.slug);
-  let illustration = $derived(config.home?.illustration ?? 'generic');
+  let illustration = $derived(config.home?.illustration);
   let headline = $derived(config.home?.headline ?? config.title);
   let summary = $derived(config.home?.summary ?? config.description);
   let featuredLink = $derived(config.links[0]);
@@ -28,9 +27,9 @@
       {#if featuredLink}<a class="button button-hero" href={featuredLink.url} target="_blank" rel="noreferrer"><BookOpen size={16} aria-hidden="true" />{featuredLink.label}<ArrowUpRight size={14} aria-hidden="true" /></a>{/if}
     </div>
   </div>
-  <div class="hero-visual" class:hero-visual-generic={illustration !== 'dna'} aria-hidden="true">
+  <div class="hero-visual" aria-hidden="true">
     <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
-    {#if illustration === 'dna'}<div class="helix">{#each Array(11) as _, index}<div class="helix-rung" style="--i: {index}"><span></span><b></b><i></i></div>{/each}</div><span class="visual-tag tag-top">[ 0.24, −0.81, 0.56, … ]</span><span class="visual-tag tag-bottom">ACGT · AGCT · TCGA</span><div class="visual-coordinate">01 / REPRESENTATION INVERSION</div>
+    {#if illustration}<img class="challenge-illustration" src={illustration} alt="" />
     {:else}<span class="generic-hero-icon"><Layers size={76} strokeWidth={1} /></span><div class="visual-coordinate">PREDICT / EVALUATE / COMPARE</div>{/if}
   </div>
 </section>
@@ -54,11 +53,11 @@
     <a href={base + '/submit'} class="step-link"><span class="step-number">03</span><span><strong>Submit your predictions</strong><small>Upload an archive and follow the evaluation</small></span><ArrowUpRight size={17} aria-hidden="true" /></a>
   </section>
 </div>
-{#if illustration === 'dna'}<SequenceDiagram />{/if}
+{#if config.home?.diagram}<img class="challenge-diagram" src={config.home.diagram} alt={config.home.diagramAlt ?? "Challenge task overview"} />{/if}
 <section class="tracks-section">
   <div class="section-title-row"><div class="section-title"><span class="section-icon"><GitBranch size={18} aria-hidden="true" /></span><h2>Evaluation tracks</h2></div>{#if dataDoc}<a class="text-link" href={base + '/docs/' + dataDoc.slug}>Data & formats <ArrowRight size={15} aria-hidden="true" /></a>{/if}</div>
   <div class="track-grid">{#each config.tracks as track, index}<a class="track-card" href={base + '/leaderboard?track=' + track.id}><div class="track-card-top"><span class="track-index">TRACK {String(index + 1).padStart(2, '0')}</span><ArrowUpRight size={18} aria-hidden="true" /></div><h3>{track.name}</h3><p>{track.model}</p><div class="track-tags"><span>{track.representation}</span><span>{track.sequenceLength} characters</span></div><div class="track-card-footer"><Database size={14} aria-hidden="true" />{track.expectedRows} {config.example ? 'synthetic' : 'reference'} rows</div></a>{/each}</div>
 </section>
-{#if resourceLink}<div class="resource-strip"><div>{#if resourceLink.url.includes('github.com')}<Github size={24} aria-hidden="true" />{:else}<BookOpen size={24} aria-hidden="true" />{/if}<span><strong>Challenge resources</strong><small>Explore the reference material provided by the challenge organizers.</small></span></div><a class="button button-secondary" href={resourceLink.url} target="_blank" rel="noreferrer">{resourceLink.label}<ArrowUpRight size={15} aria-hidden="true" /></a></div>{/if}
+{#if resourceLink}<div class="resource-strip"><div>{#if resourceLink.url.includes('github.com')}<CodeXml size={24} aria-hidden="true" />{:else}<BookOpen size={24} aria-hidden="true" />{/if}<span><strong>Challenge resources</strong><small>Explore the reference material provided by the challenge organizers.</small></span></div><a class="button button-secondary" href={resourceLink.url} target="_blank" rel="noreferrer">{resourceLink.label}<ArrowUpRight size={15} aria-hidden="true" /></a></div>{/if}
 
 

@@ -75,9 +75,16 @@ challenges/<slug>/
     scoring.md
 ```
 
-Copy example → change IDs/copy/tracks/resources → choose `home.illustration` (`dna`/`generic`)
-→ supply versioned private references → validate → seed/restart. `home` optional;
-omitted = generic hero + description. Register info pages in `docs[]`; unlisted Markdown
-not exposed as a documentation route. Home body may be omitted from navigation.
+Copy the example and change its IDs, content, tracks, and resources. Supply versioned
+private references, validate, then seed and restart. `home` is optional; omitting it
+uses the generic hero and challenge description. Register info pages in `docs[]`;
+unlisted Markdown is not exposed as a documentation route.
+
+Optional `logo`, `home.illustration`, and `home.diagram` fields accept local paths such as
+`/challenge-assets/example/logo.svg`. Place files under `static/challenge-assets/<slug>/`.
+Supported extensions are SVG, PNG, WebP, and JPG; filenames use lowercase letters,
+numbers, and hyphens. Startup validates the path and checks that the file exists.
+Use `home.diagramAlt` to describe a task diagram. Omit image fields for the default icons.
+Asset changes require rebuilding the web image.
 
 Git diff/review available when a repository is configured; file edits do not commit/push.

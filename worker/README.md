@@ -25,7 +25,7 @@ uv run --frozen --project worker python -m pytest worker/tests
 - One UTF-8 CSV, header exactly `id,sequence`, inside ZIP or `.tar.gz/.tgz/.tar.bz2/.tar.xz`.
 - Unique ids, exact reference id set; row order irrelevant.
 - Ids: 1–128 characters, no surrounding whitespace. Strings: 0–512 characters.
-- Generic strings; no DNA alphabet constraint. Control characters rejected.
+- Arbitrary text strings; control characters rejected.
 - Limits: 10 MiB compressed, 64 MiB CSV, 65 MiB total TAR, 100,000 rows, 32 entries.
 - Safe directory entries allowed; traversal, absolute paths, links, special/sparse files,
   encrypted ZIP, extra files and malformed CSV rejected. Stream members; never extract.
@@ -41,5 +41,5 @@ uv run --frozen --project worker python -m pytest worker/tests
 Both empty: accuracy/similarity/exact match 1, distance 0. One empty: accuracy/similarity
 0, distance equal to other length. Positional accuracy does not realign insertions.
 
-Example fixtures are synthetic; they do not reproduce paper datasets, embeddings or
-reported scores. Replace the worker-only reference mount and dataset version for real use.
+Example fixtures contain synthetic text for exercising validation and scoring.
+Replace the worker-only reference mount and dataset version for real use.
