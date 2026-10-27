@@ -25,7 +25,6 @@ jobs:
           ref: main
           path: tmp/openchallenge-upstream
           fetch-depth: 0
-          ssh-key: ${{ secrets.OPENCHALLENGE_UPSTREAM_SSH_KEY }}
           persist-credentials: false
       - name: Merge upstream and open a review pull request
         env:

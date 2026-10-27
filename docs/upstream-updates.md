@@ -30,12 +30,10 @@ The derived repository's Actions tab also provides a manual **Sync template** wo
 It merges upstream changes into `update-openchallenge-template` and opens or updates a
 pull request. Enable write access and pull-request creation for GitHub Actions in that
 repository's Actions settings. Merge conflicts stop the workflow for manual resolution.
-For a private upstream, register a read-only SSH deploy key on OpenChallenge and store
-its private key as `OPENCHALLENGE_UPSTREAM_SSH_KEY` in the derived repository's Actions
-secrets. The upstream checkout uses this key only to read the template; the repository's
-own workflow token pushes the update branch and creates the PR. No personal access
-token needs to be stored in the derived repository. Public upstreams can omit the key.
-The local SSH workflow above remains available independently.
+OpenChallenge is public, so the hosted workflow reads it without additional SSH keys
+or stored personal tokens. The derived repository's built-in workflow token pushes
+the update branch and creates the PR; the derived repository can remain private.
+The local SSH workflow above uses the SSH identity already configured on your computer.
 
 For a general fix discovered while working on a site, create its branch from
 `upstream/main` and propose it to OpenChallenge first. This keeps challenge-specific
