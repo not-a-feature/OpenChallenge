@@ -1,0 +1,63 @@
+services:
+  db:
+    ports: !reset []
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+  web:
+    build:
+      args:
+        ORIGIN: https://${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+    ports: !reset []
+    networks: [frontend, backend]
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 1g
+    environment:
+      ORIGIN: https://${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+      BETTER_AUTH_URL: https://${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+      DEMO_MODE: "false"
+      ADDRESS_HEADER: X-Forwarded-For
+      XFF_DEPTH: "1"
+  worker:
+    networks: [backend]
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777,noexec,nosuid,nodev
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    volumes:
+      - uploads:/data/uploads:ro
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+  caddy:
+    image: caddy:2-alpine
+    networks: [frontend]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 128
+    mem_limit: 256m
+    environment:
+      PUBLIC_DOMAIN: ${PUBLIC_DOMAIN:?Set PUBLIC_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      web:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  caddy-data:
+  caddy-config:
+networks:
+  frontend:
+  backend:
+    internal: true

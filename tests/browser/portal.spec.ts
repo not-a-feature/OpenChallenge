@@ -1,0 +1,85 @@
+import { test, expect } from '@playwright/test';
+import { resolve } from 'node:path';
+
+test('portal pages, guest permissions, and narrow layout smoke', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/challenges/dna-inversion');
+  await expect(page.getByRole('heading', { name: /DNA Inversion Challenge/i }).first()).toBeVisible();
+  await page.screenshot({ path: '.test-runtime/desktop.png', fullPage: true });
+  await page.goto('/challenges/dna-inversion/leaderboard');
+  await expect(page.getByRole('heading', { name: /Leaderboard/i }).first()).toBeVisible();
+  await page.goto('/challenges/dna-inversion/submit');
+  await expect(page.locator('input[type="file"]')).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Performance over time' })).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/challenges/dna-inversion');
+  await expect(page.getByRole('heading', { name: /DNA Inversion Challenge/i }).first()).toBeVisible();
+  const fits = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
+  expect(fits).toBe(true);
+  await page.screenshot({ path: '.test-runtime/mobile.png', fullPage: true });
+  if (process.env.PORTAL_INTEGRATION_BROWSER === 'true') {
+    await page.goto('/challenges/dna-inversion/leaderboard?track=dnabert2-mean32');
+    const progress = page.locator('section[aria-labelledby="public-progress-heading"]');
+    await expect(progress.getByRole('heading', { name: 'Public leaderboard progress' })).toBeVisible();
+    await expect(progress.locator('circle')).toHaveCount(2);
+    await expect(progress.getByRole('button', { name: /75.00%/ })).toHaveCount(1);
+    await expect(progress.getByRole('button', { name: /100.00%/ })).toHaveCount(1);
+    await expect(progress.getByRole('button', { name: /60.00%|99.00%/ })).toHaveCount(0);
+    await progress.getByRole('button', { name: /75.00%/ }).focus();
+    await expect(progress.getByRole('status')).toContainText('75.00%');
+    const html = await page.content();
+    expect(html).not.toContain('earlier.zip');
+    expect(html).not.toContain('regression.zip');
+    await progress.getByRole('button', { name: 'Integration Team', exact: true }).click();
+    await expect(progress.locator('circle')).toHaveCount(0);
+    await progress.getByRole('button', { name: 'Integration Team', exact: true }).click();
+    await expect(progress.locator('circle')).toHaveCount(2);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    await page.setViewportSize({ width: 1440, height: 1000 });
+    await progress.screenshot({ path: '.test-runtime/public-progress.png', animations: 'disabled' });
+  }
+});
+
+test('demo login, navigation, and archive selection work under CSP', async ({ page }) => {
+  test.skip(process.env.PORTAL_INTEGRATION_BROWSER !== 'true', 'Requires the isolated integration fixture.');
+  const failures: string[] = [];
+  page.on('pageerror', (failure) => failures.push(failure.message));
+  page.on('console', (message) => {
+    if (message.type() === 'error' && /content security policy|violates.*directive/i.test(message.text())) failures.push(message.text());
+  });
+  await page.goto('/login');
+  const response = await page.request.get('/login');
+  expect(response.headers()['content-security-policy']).toContain("script-src 'self' 'nonce-");
+  await page.getByRole('button', { name: 'Try the local demo' }).click();
+  await expect(page).toHaveURL(/\/team$/);
+  await expect(page.getByText('Integration Team', { exact: true }).first()).toBeVisible();
+  await page.goto('/challenges/dna-inversion/submit');
+  const chart = page.locator('section[aria-labelledby="performance-heading"]');
+  await expect(chart.getByRole('heading', { name: 'Performance over time' })).toBeVisible();
+  await expect(chart.locator('.score-point')).toHaveCount(3);
+  await expect(chart.getByText('100.00%', { exact: true })).toHaveCount(2);
+  await expect(chart.getByText('25.00 pp', { exact: true })).toBeVisible();
+  await expect(chart.getByRole('link', { name: /archived.zip/ })).toHaveCount(0);
+  await expect(chart.locator('.best-line')).toHaveAttribute('d', /^M .* H .* V .* H .* V /);
+  await page.getByLabel('Chart metric').selectOption('levenshtein_distance');
+  await expect(chart.getByText('Lower is better', { exact: true })).toBeVisible();
+  await expect(chart.getByText('0.00', { exact: true })).toHaveCount(2);
+  await expect(chart.getByText('8.00 fewer edits', { exact: true })).toBeVisible();
+  await page.getByLabel('Chart track').selectOption('evo2-mean32');
+  await expect(chart.getByRole('heading', { name: 'No evaluated submissions on this track yet' })).toBeVisible();
+  await expect(chart.locator('.score-point')).toHaveCount(0);
+  await page.getByLabel('Chart track').selectOption('dnabert2-mean32');
+  await page.getByLabel('Chart metric').selectOption('levenshtein_similarity');
+  await chart.getByRole('link', { name: /perfect.zip:/ }).click();
+  await expect(page.locator('tr:target')).toContainText('perfect.zip');
+  await chart.screenshot({ path: '.test-runtime/performance-desktop.png' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await chart.screenshot({ path: '.test-runtime/performance-mobile.png', animations: 'disabled' });
+  await page.locator('input[type="file"]').setInputFiles(resolve('examples/dna-inversion/sample.zip'));
+  await expect(page.getByText('sample.zip', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Submit predictions', exact: true })).toBeEnabled();
+  await page.getByRole('link', { name: 'File format', exact: true }).click();
+  await expect(page).toHaveURL(/\/docs\/data$/);
+  expect(failures).toEqual([]);
+});

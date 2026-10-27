@@ -1,0 +1,27 @@
+{
+  "slug": "dna-inversion",
+  "title": "DNA Inversion Challenge",
+  "shortTitle": "DNA Inversion",
+  "description": "Reconstruct nucleotide sequences from genomic embeddings. Compare approaches across foundation models and explore what their representations reveal.",
+  "home": {
+    "headline": "From representations back to sequences.",
+    "summary": "Build a reconstruction method, submit predicted DNA sequences, and compare recovery quality across benchmark tracks.",
+    "body": "home.md",
+    "illustration": "dna"
+  },
+  "example": true,
+  "datasetVersion": "synthetic-v1",
+  "evaluator": "sequence",
+  "primaryMetric": "levenshtein_similarity",
+  "dailyLimit": 10,
+  "maxUploadBytes": 10485760,
+  "teamSizeLimit": 10,
+  "closesAt": null,
+  "tracks": [
+    { "id": "dnabert2-mean32", "name": "DNABERT-2 · mean pooled", "model": "DNABERT-2", "representation": "Mean pooled", "sequenceLength": 32, "referenceFile": "reference.csv", "expectedRows": 12, "weight": 1 },
+    { "id": "evo2-mean32", "name": "Evo 2 · mean pooled", "model": "Evo 2", "representation": "Mean pooled", "sequenceLength": 32, "referenceFile": "reference.csv", "expectedRows": 12, "weight": 1 },
+    { "id": "ntv2-mean32", "name": "NTv2 · mean pooled", "model": "NTv2", "representation": "Mean pooled", "sequenceLength": 32, "referenceFile": "reference.csv", "expectedRows": 12, "weight": 1 }
+  ],
+  "docs": [ { "slug": "overview", "title": "Challenge overview" }, { "slug": "data", "title": "Data & submission format" }, { "slug": "rules", "title": "Participation rules" }, { "slug": "scoring", "title": "Evaluation & metrics" } ],
+  "links": [ { "label": "Read the paper", "url": "https://arxiv.org/abs/2603.06950" }, { "label": "Research code", "url": "https://github.com/not-a-feature/DNA-Embedding-Inversion" } ]
+}

@@ -1,0 +1,16 @@
+node_modules/
+.svelte-kit/
+build/
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+.test-runtime/
+test-results/
+playwright-report/
+data/
+tmp/
+worker/.venv/
+worker/.pytest_cache/
