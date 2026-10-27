@@ -18,6 +18,7 @@ COPY --from=build /app/build ./build
 COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/src/lib/server ./src/lib/server
 COPY --from=build /app/challenges ./challenges
+COPY --from=build /app/static ./static
 COPY --from=build /app/migrations ./migrations
 COPY --from=build /app/examples ./examples
 USER portal
