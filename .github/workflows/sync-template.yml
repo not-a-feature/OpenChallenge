@@ -18,6 +18,15 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
+      - name: Read the upstream template
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: not-a-feature/OpenChallenge
+          ref: main
+          path: tmp/openchallenge-upstream
+          fetch-depth: 0
+          ssh-key: ${{ secrets.OPENCHALLENGE_UPSTREAM_SSH_KEY }}
+          persist-credentials: false
       - name: Merge upstream and open a review pull request
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -25,7 +34,7 @@ jobs:
           set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git remote add upstream https://github.com/not-a-feature/OpenChallenge.git
+          git remote add upstream "$GITHUB_WORKSPACE/tmp/openchallenge-upstream"
           git fetch upstream main
           if git merge-base --is-ancestor upstream/main HEAD; then
             echo 'The site already includes the current template.'
